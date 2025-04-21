@@ -20,26 +20,38 @@ func init() {
 }
 
 func runUpdateProviderCommand(cmd *cobra.Command, args []string) error {
-	targetProviderAddress := args[0]
+	targetLocalName := args[0]
 	targetVersion := args[1]
-	localName, err := parseSourceAddressToLocalName(targetProviderAddress)
-	if err != nil {
-		return err
-	}
 
 	if verbose {
-		fmt.Printf("Will update provider '%s' ('%s') to version '%s'\n", targetProviderAddress, localName, targetVersion)
+		fmt.Printf("Will update provider with local name '%s' to version '%s'\n", targetLocalName, targetVersion)
 	}
 
 	// TODO: Find "versions.tf" dynamicly
-	err = updateProvider("versions.tf", localName, targetProviderAddress, targetVersion)
+	err := updateProvider("versions.tf", targetLocalName, targetVersion)
 	return err
 }
 
-func updateProvider(filename, localName, providerAddress, newVersion string) error {
+func updateProvider(filename, localName, newVersion string) error {
 	return patchFile(filename, func(hclFile *hclwrite.File) (*hclwrite.File, error) {
 
-		bl, _ := getBlockByTypeForWrite(hclFile.Body(), "terraform")
+		bl, err := getBlockByTypeForWrite(hclFile.Body(), "terraform")
+		if err != nil {
+			return nil, err
+		}
+
+		bl, err = getBlockByTypeForWrite(hclFile.Body(), "required_providers")
+		if err != nil {
+			return nil, err
+		}
+
+		providerAttribute := bl.Body().GetAttribute(localName)
+		if providerAttribute == nil {
+			return nil, fmt.Errorf("Cannot find provider for localName '%s'", localName)
+		}
+
+		headlessBlock := providerAttribute.BuildTokens(nil).Bytes()
+		fmt.Println(headlessBlock)
 
 		bl.Body().SetAttributeValue("version", cty.StringVal(newVersion))
 		return hclFile, nil

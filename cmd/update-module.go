@@ -65,22 +65,12 @@ func updateModuleForAllFiles(moduleId, newVersion string) error {
 
 func updateModule(filename, moduleId, newVersion string) error {
 	return patchFile(filename, func(hclFile *hclwrite.File) (*hclwrite.File, error) {
-		mods := getModuleBlocksBySourceForWrite(hclFile, moduleId)
+		mods := getModuleBlocksBySourceForWrite(hclFile.Body(), moduleId)
 		for _, m := range mods {
 			m.Body().SetAttributeValue(attributeName, cty.StringVal(newVersion))
 		}
 		return hclFile, nil
 	})
-}
-
-func getModuleBlocksBySourceForWrite(hclFile *hclwrite.File, moduleId string) []*hclwrite.Block {
-	var modBlocks []*hclwrite.Block
-	for _, bl := range hclFile.Body().Blocks() {
-		if bl.Type() == "module" && isSource(bl, moduleId) {
-			modBlocks = append(modBlocks, bl)
-		}
-	}
-	return modBlocks
 }
 
 func isSource(bl *hclwrite.Block, moduleId string) bool {

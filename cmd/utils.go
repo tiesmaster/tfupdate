@@ -56,6 +56,16 @@ func patchFile(filename string, patch func(hclFile *hclwrite.File) (*hclwrite.Fi
 	return nil
 }
 
+func getModuleBlocksBySourceForWrite(hclBody *hclwrite.Body, moduleId string) []*hclwrite.Block {
+	var modBlocks []*hclwrite.Block
+	for _, bl := range hclBody.Blocks() {
+		if bl.Type() == "module" && isSource(bl, moduleId) {
+			modBlocks = append(modBlocks, bl)
+		}
+	}
+	return modBlocks
+}
+
 func getBlockByTypeForWrite(hclBody *hclwrite.Body, typeId string) (*hclwrite.Block, error) {
 	for _, bl := range hclBody.Blocks() {
 		if bl.Type() == typeId {

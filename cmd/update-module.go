@@ -10,8 +10,8 @@ import (
 )
 
 var updateModuleCmd = &cobra.Command{
-	Use:   "update-module MODULE_ID VERSION",
-	Short: "Update module",
+	Use:   "module MODULE_ID VERSION",
+	Short: "Update a Terraform module to a new version",
 	RunE:  runUpdateModuleCommand,
 	Args:  cobra.ExactArgs(2),
 }
@@ -19,7 +19,7 @@ var updateModuleCmd = &cobra.Command{
 var attributeName string
 
 func init() {
-	rootCmd.AddCommand(updateModuleCmd)
+	updateCmd.AddCommand(updateModuleCmd)
 	updateModuleCmd.Flags().StringVarP(&attributeName, "attribute-name", "n", "version", "attribute name to use for the version")
 }
 

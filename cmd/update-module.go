@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/spf13/cobra"
 	"github.com/zclconf/go-cty/cty"
@@ -29,7 +28,7 @@ func runUpdateModuleCommand(cmd *cobra.Command, args []string) error {
 	targetModule := args[0]
 	targetVersion := args[1]
 
-	fmt.Printf("Will update module '%s' to version '%s'\n", args[0], args[1])
+	// fmt.Printf("Will update module '%s' to version '%s'\n", args[0], args[1])
 
 	err := updateModuleForAllFiles(targetModule, targetVersion)
 	return err
@@ -106,32 +105,9 @@ func isSource(bl *hclwrite.Block, moduleId string) bool {
 	srcAttr := bl.Body().GetAttribute("source")
 	expr := srcAttr.Expr()
 	tokens := expr.BuildTokens(nil)
-	for _, t := range tokens {
-		fmt.Println(t)
-	}
 
-	moduleSource := getStringValue(expr)
-	moduleSource = string(tokens.Bytes())
+	moduleSource := string(tokens.Bytes())
 	s := strings.TrimSpace(moduleSource)
 	s = strings.Trim(s, `"`)
 	return s == moduleId
 }
-
-func getStringValue(expr *hclwrite.Expression) string {
-	for _, t := range expr.BuildTokens(nil) {
-		if t.Type == hclsyntax.TokenQuotedLit {
-			return string(t.Bytes)
-		}
-	}
-
-	panic("cannot reach")
-	// or just return error
-}
-
-// func getStringValue2(expr *hclwrite.Expression) string {
-// 	trav, diags := hcl.AbsTraversalForExpr(nil)
-// 	for _, tr := range trav {
-// 		tr.
-
-// 	}
-// }

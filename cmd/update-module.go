@@ -17,7 +17,7 @@ var updateModuleCmd = &cobra.Command{
 	Use:   "update-module MODULE_ID VERSION",
 	Short: "Update module",
 	RunE:  runUpdateModuleCommand,
-	Args: cobra.ExactArgs(2),
+	Args:  cobra.ExactArgs(2),
 }
 
 func init() {
@@ -28,7 +28,9 @@ func runUpdateModuleCommand(cmd *cobra.Command, args []string) error {
 	targetModule := args[0]
 	targetVersion := args[1]
 
-	// fmt.Printf("Will update module '%s' to version '%s'\n", args[0], args[1])
+	if verbose {
+		fmt.Printf("Will update module '%s' to version '%s'\n", args[0], args[1])
+	}
 
 	err := updateModuleForAllFiles(targetModule, targetVersion)
 	return err

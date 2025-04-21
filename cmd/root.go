@@ -17,3 +17,9 @@ func Execute() {
 		os.Exit(1)
 	}
 }
+
+var verbose bool
+
+func init() {
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print verbose output")
+}

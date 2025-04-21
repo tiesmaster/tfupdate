@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+import "github.com/tiesmaster/tfupdate/cmd"
 
 func main() {
-	fmt.Println("Hi, from tfupdate")
+	cmd.Execute()
 }

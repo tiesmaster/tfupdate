@@ -16,8 +16,11 @@ var updateModuleCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(2),
 }
 
+var attributeName string
+
 func init() {
 	rootCmd.AddCommand(updateModuleCmd)
+	updateModuleCmd.Flags().StringVarP(&attributeName, "attribute-name", "n", "version", "attribute name to use for the version")
 }
 
 func runUpdateModuleCommand(cmd *cobra.Command, args []string) error {
@@ -64,7 +67,7 @@ func updateModule(filename, moduleId, newVersion string) error {
 	return patchFile(filename, func(hclFile *hclwrite.File) (*hclwrite.File, error) {
 		mods := getModuleBlocksBySourceForWrite(hclFile, moduleId)
 		for _, m := range mods {
-			m.Body().SetAttributeValue("version", cty.StringVal(newVersion))
+			m.Body().SetAttributeValue(attributeName, cty.StringVal(newVersion))
 		}
 		return hclFile, nil
 	})

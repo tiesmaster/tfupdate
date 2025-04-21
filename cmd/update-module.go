@@ -51,7 +51,10 @@ func updateModuleForAllFiles(moduleId, newVersion string) error {
 	}
 
 	for _, f := range tfFiles {
-		updateModule(f, moduleId, newVersion)
+		err = updateModule(f, moduleId, newVersion)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

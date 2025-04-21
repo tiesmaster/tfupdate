@@ -33,9 +33,21 @@ func runUpdateModuleCommand(cmd *cobra.Command, args []string) error {
 }
 
 func updateModuleForAllFiles(moduleId, newVersion string) error {
+	err := ensureTargetDir()
+	if err != nil {
+		return err
+	}
+
 	tfFiles, err := getTerraformFiles()
 	if err != nil {
 		return err
+	}
+
+	if verbose {
+		fmt.Println("Discovered TF files: ")
+		for _, m := range tfFiles {
+			fmt.Printf("\t%v\n", m)
+		}
 	}
 
 	for _, f := range tfFiles {

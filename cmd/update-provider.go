@@ -20,6 +20,11 @@ func init() {
 }
 
 func runUpdateProviderCommand(cmd *cobra.Command, args []string) error {
+	err := ensureTargetDir()
+	if err != nil {
+		return err
+	}
+
 	targetLocalName := args[0]
 	targetVersion := args[1]
 
@@ -28,7 +33,7 @@ func runUpdateProviderCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	// TODO: Find "versions.tf" dynamicly
-	err := updateProvider("versions.tf", targetLocalName, targetVersion)
+	err = updateProvider("versions.tf", targetLocalName, targetVersion)
 	return err
 }
 
@@ -40,7 +45,7 @@ func updateProvider(filename, localName, newVersion string) error {
 			return nil, err
 		}
 
-		bl, err = getBlockByTypeForWrite(hclFile.Body(), "required_providers")
+		bl, err = getBlockByTypeForWrite(bl.Body(), "required_providers")
 		if err != nil {
 			return nil, err
 		}
@@ -51,7 +56,7 @@ func updateProvider(filename, localName, newVersion string) error {
 		}
 
 		headlessBlock := providerAttribute.BuildTokens(nil).Bytes()
-		fmt.Println(headlessBlock)
+		fmt.Println(string(headlessBlock))
 
 		bl.Body().SetAttributeValue("version", cty.StringVal(newVersion))
 		return hclFile, nil

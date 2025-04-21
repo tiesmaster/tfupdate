@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclwrite"
@@ -53,4 +54,23 @@ func patchFile(filename string, patch func(hclFile *hclwrite.File) (*hclwrite.Fi
 	}
 
 	return nil
+}
+
+func getBlockByTypeForWrite(hclBody *hclwrite.Body, typeId string) (*hclwrite.Block, error) {
+	for _, bl := range hclBody.Blocks() {
+		if bl.Type() == typeId {
+			return bl, nil
+		}
+	}
+
+	return nil, errors.New("Cannot find block with type " + typeId)
+}
+
+func parseSourceAddressToLocalName(sourceAddress string) (string, error) {
+	s := strings.Split(sourceAddress, "/")
+	if len(s) != 2 {
+		return "", errors.New("Unable to parse source address " + sourceAddress + "as valid Terraform provider")
+	}
+
+	return s[1], nil
 }
